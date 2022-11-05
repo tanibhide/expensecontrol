@@ -2,7 +2,6 @@ from logging import exception
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-from flask_bootstrap import Bootstrap
 # from flask_modals import Modal, render_template_modal
 
 import os
@@ -18,8 +17,6 @@ app.config['MYSQL_DB'] = 'expensecontrol'
 app.config['MYSQL_HOST'] = 'localhost'
 mysql.init_app(app)
 
-bootstrap = Bootstrap()
-bootstrap.init_app(app)
 # modal = Modal(app)
 
 app.secret_key = os.urandom(12)
