@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h2>Profile Page</h2>
+<div>
+    <p>Your account details are below:</p>
+    <table>
+        <tr>
+            <td>Employee Number:</td>
+            <td>{{ account['employee_number'] }}</td>
+        </tr>
+        <tr>
+            <td>Employee Name:</td>
+            <td>{{ account['employee_name'] }}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>{{ account['employee_email'] }}</td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

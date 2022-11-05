@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+{% block title %}Expense Report: {{ report['title'] }} {% endblock %}
+
+{% block content %}
+<h3>Expense Report: {{ report['title'] }}</h3>
+<h4>Status: {{ report['status'] }}, Last updated: {{ report['last_update_ts'] }}
+{% if 'APPROVED' == report['status'] %}
+	, Approved by: {{ report['approver_employee_name'] }}
+{% endif %}
+</h4>
+<h4>Total amount: {{ report_total['total'] }}</h4>
+
+{% if report['status'] != 'SUBMITTED' and report['status'] != 'APPROVED' %}
+    <a href="{{ url_for('add_expense_to_report', report_id=report['id']) }}">Add an expense</a><br>
+
+    <form action="{{ url_for('submit_report') }}" method="POST">
+        <input type="hidden" name="report_id" 
+            id="report_id" value="{{ report['id'] }}"/>
+        
+        <div>
+            <label for="approver">Select Approver: 
+            </label>
+            <select name=approver>
+                {% for approver in approvers %}
+                    <option value="{{approver['employee_number']}}" SELECTED>{{approver['employee_name']}}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Submit Report</button>
+        </div>
+    </form>
+{% else %}
+    <form action="{{ url_for('revoke_report') }}" method="POST">
+        <input type="hidden" name="report_id" 
+            id="report_id" value="{{ report['id'] }}" >
+        <button type="submit">Revoke Report</button>
+    </form>
+{% endif %}
+
+<table id="expense_report_details" class="styled-table">
+    <thead>
+        <tr>
+            <td>Type</td>
+            <td>Created</td>
+            <td>Location</td>
+            <td>Amount</td>
+            <td>Currency</td>
+            <td>Purpose</td>
+            <td>Actions</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for expense in expenses %}
+        <tr>
+            <td>{{ expense['type'] }}</td>
+            <td>{{ expense['create_ts'] }}</td>
+            <td>{{ expense['location'] }}</td>
+            <td>{{ expense['amount'] }}</td>
+            <td>{{ expense['currency'] }}</td>
+            <td>{{ expense['purpose'] }}</td>
+            <td>
+                <a href="{{ url_for('edit_expense', report_id=report['id'], expense_id=expense['id']) }}">
+                    <img src = "/static/edit.png" height="15" width="15"></a>
+                <a href="{{ url_for('delete_expense', report_id=report['id'], expense_id=expense['id']) }}" 
+                    onclick="return confirm('Are you sure you want to delete this expense?');">
+                    <img src = "/static/delete.png" height="15" width="15">
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

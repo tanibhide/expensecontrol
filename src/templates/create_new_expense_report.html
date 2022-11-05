@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title %}Create new Expense Report {% endblock %}
+
+{% block content %}
+<h3>Create new Expense Report</h3>
+
+<div class="add_expense">
+<form action="{{ url_for('add_new_expense_report') }}" method="POST">
+    <div class="form-group">
+    <label for="report_title">
+        <i class="fas fa-wallet"></i>
+    </label>
+    <input type="text" name="report_title" placeholder="Title" id="report_title" required>
+    </div>
+
+    <input type="submit" value="Create Report"/>
+  </form>
+  </div>
+
+{% endblock %}

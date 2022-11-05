@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block title %}Approve Reports{% endblock %}
+
+{% block content %}
+
+{% if expense_reports|length > 0 %}
+
+<table id="expense_reports" class="styled-table">
+    <thead>
+        <tr>
+            <td>Report ID</td>
+            <td>Title</td>
+            <td>Created</td>
+            <td>Submitted</td>
+            <td>Status</td>
+            <td>Last Updated</td>
+            <td>Actions</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in expense_reports %}
+        <tr>
+            <td>{{ report['id'] }}</td>
+            <td><a href="/expensecontrol/reportdetails/{{ report['id'] }}">{{ report['title'] }}</a></td>
+            <td>{{ report['create_ts'] }}</td>
+            <td>{{ report ['employee_name'] }}</td>
+            <td>{{ report['status'] }}</td>
+            <td>{{ report['last_update_ts'] }}</td>
+            <td>
+                <a href="{{ url_for('approve_report', report_id=report['id']) }}" 
+                onclick="return confirm('Are you sure you want to approve this report?');">
+                    <img src = "/static/approve.png" height="15" width="15">
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+<h4>No reports available for approval</h4>
+{% endif %}
+
+{% endblock %}

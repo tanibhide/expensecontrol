@@ -1,0 +1,25 @@
+Database setup:
+Open MySQL Shell
+\sql
+\connect --mysql expensecontrol@localhost
+\use expensecontrol
+
+To drop all data and tables:
+\source C:\Users\Admin\tsb\expensecontrol\src\db\droptables.sql
+
+To setup empty DB schema:
+\source C:\Users\Admin\tsb\expensecontrol\src\db\dbsetup.sql
+
+
+
+
+Running the app:
+Open terminal from VS Code (Command prompt, not powershell)
+cd to expensecontrol directory
+Scripts\Activate
+cd src\src
+
+To insert dummy data:
+python dummydata.py
+
+python -m flask run
