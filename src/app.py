@@ -222,7 +222,6 @@ def add_new_expense_report():
 
 @app.route('/expensecontrol/add_expense', methods=['GET', 'POST'])
 def add_expense():
-    print(request.form['report_id'])
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
     sql = "insert into expenses (expense_report_id, type, create_ts, location, \
@@ -259,6 +258,19 @@ def edit_expense(report_id, expense_id):
         return render_template('edit_expense.html', report=report, expense=expense, 
         expense_types=expense_types, currencies=currencies)
     return redirect(url_for('login'))
+
+@app.route('/expensecontrol/execute_edit_expense', methods=['GET', 'POST'])
+def execute_edit_expense():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute("update expenses set type = %s, location = %s, amount = %s, \
+                    currency = %s, purpose = %s \
+            where id = %s", (request.form['type'], request.form['location'], 
+            request.form['amount'], request.form['currency'], 
+            request.form['purpose'], request.form['expense_id'],))
+    mysql.connection.commit()
+    cursor.close()
+    return redirect(url_for('expense_report_details', report_id=request.form['report_id']))
 
 @app.route('/expensecontrol/delete_expense/<report_id>/<expense_id>')
 def delete_expense(report_id, expense_id):

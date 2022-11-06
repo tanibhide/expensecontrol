@@ -6,9 +6,12 @@
 <h3>Edit Expense:</h3>
 
 <div class="add_expense">
-<form action="" method="POST">
+<form action="{{ url_for('execute_edit_expense') }}" method="POST">
     <input type="hidden" name="report_id" 
     id="report_id" value="{{ report['id'] }}" >
+
+    <input type="hidden" name="expense_id" 
+    id="expense_id" value="{{ expense['id'] }}" >
     
     <div class="form-group">
     <label for="type">
