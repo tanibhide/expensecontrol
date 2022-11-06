@@ -319,12 +319,18 @@ def submit_report():
         return redirect(url_for('expense_report_details', report_id=report_id))
     return redirect(url_for('login'))
 
-
-@app.route('/expensecontrol/approve_report,<report_id>')
+@app.route('/expensecontrol/approve_report/<report_id>')
 def approve_report(report_id):
     if 'loggedin' in session:
         update_report_status(report_id=report_id, status='APPROVED', approver_employee_number=session['employee_number'])
         return redirect(url_for('list_of_reports_for_approval'))
+    return redirect(url_for('login'))
+
+@app.route('/expensecontrol/reimburse_report/<report_id>')
+def reimburse_report(report_id):
+    if 'loggedin' in session:
+        update_report_status(report_id=report_id, status='REIMBURSED')
+        return redirect(url_for('admin_list_reports'))
     return redirect(url_for('login'))
 
 @app.route('/expensecontrol/revoke_report', methods=['POST'])
@@ -334,6 +340,20 @@ def revoke_report():
         update_report_status(report_id=report_id, status='REVOKED')
         return redirect(url_for('expense_report_details', report_id=report_id))
     return redirect(url_for('login'))
+
+@app.route('/expensecontrol/admin_list_reports')
+def admin_list_reports():
+    if 'loggedin' in session:
+        if 'ADMIN' in session['roles']:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('select r.*, u.employee_name as employee_name from expense_reports r, employees u where \
+                r.employee_number = u.employee_number')
+            reports = cursor.fetchall()
+            cursor.close()
+            return render_template('admin_list_reports.html', expense_reports=reports)
+        else:
+            return render_template('home.html')
+    return redirect(url_for('login'))    
 
 def get_report_by_id(report_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
