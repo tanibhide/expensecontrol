@@ -245,6 +245,8 @@ def add_expense():
 def edit_expense(report_id, expense_id):
     if 'loggedin' in session:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('select * from expense_reports where id = %s', (report_id,))
+        report = cursor.fetchone()
         cursor.execute('select * from expenses where id = %s', (expense_id,))
         expense = cursor.fetchone()
 
@@ -254,7 +256,7 @@ def edit_expense(report_id, expense_id):
         cursor.execute('select ccy from currencies')
         currencies = cursor.fetchall()
         cursor.close()
-        return render_template('edit_expense.html', expense=expense, 
+        return render_template('edit_expense.html', report=report, expense=expense, 
         expense_types=expense_types, currencies=currencies)
     return redirect(url_for('login'))
 
