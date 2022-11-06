@@ -70,50 +70,68 @@ def logout():
 # http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
 @app.route('/expensecontrol/register', methods=['GET', 'POST'])
 def register():
-    # Output message if something goes wrong...
-    msg = ''
-    # Check if "employee_number", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-            'employee_number' in request.form and \
-            'password' in request.form and \
-            'email' in request.form and \
-            'employee_name' in request.form and \
-            'bank_name' in request.form and \
-            'account_number' in request.form and \
-            'ifsc_code' in request.form:
-        # Create variables for easy access
-        employee_number = request.form['employee_number']
-        password = request.form['password']
-        email = request.form['email']
-        employee_name = request.form['employee_name']
-        bank_name = request.form['bank_name']
-        account_number = request.form['account_number']
-        ifsc_code = request.form['ifsc_code']
+    if 'loggedin' in session:
+        if 'ADMIN' in session['roles']:
+            # Output message if something goes wrong...
+            msg = ''
+            # Check if "employee_number", "password" and "email" POST requests exist (user submitted form)
+            if request.method == 'POST' and \
+                    'employee_number' in request.form and \
+                    'password' in request.form and \
+                    'email' in request.form and \
+                    'employee_name' in request.form and \
+                    'bank_name' in request.form and \
+                    'account_number' in request.form and \
+                    'ifsc_code' in request.form:
+                # Create variables for easy access
+                employee_number = request.form['employee_number']
+                password = request.form['password']
+                email = request.form['email']
+                employee_name = request.form['employee_name']
+                bank_name = request.form['bank_name']
+                account_number = request.form['account_number']
+                ifsc_code = request.form['ifsc_code']
+                approver = 'role_approver' in request.form
 
-        # Check if account exists using MySQL
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM employees WHERE employee_number = %s', (employee_number,))
-        account = cursor.fetchone()
-        # If account exists show error and validation checks
-        if account:
-            msg = 'Account already exists!'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Invalid email address!'
-        elif not re.match(r'[A-Za-z0-9]+', employee_name):
-            msg = 'Username must contain only characters and numbers!'
-        elif not employee_number or not employee_name or not password or not email:
-            msg = 'Please fill out the form!'
+                # Check if account exists using MySQL
+                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                cursor.execute('SELECT * FROM employees WHERE employee_number = %s', (employee_number,))
+                account = cursor.fetchone()
+                # If account exists show error and validation checks
+                if account:
+                    msg = 'Account already exists!'
+                elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+                    msg = 'Invalid email address!'
+                elif not re.match(r'[A-Za-z0-9]+', employee_name):
+                    msg = 'Username must contain only characters and numbers!'
+                elif not employee_number or not employee_name or not password or not email:
+                    msg = 'Please fill out the form!'
+                else:
+                    # Account doesnt exists and the form data is valid, now insert new account into accounts table
+                    cursor.execute('INSERT INTO employees VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)', 
+                        (employee_number, password, employee_name, email, bank_name, account_number, ifsc_code,))
+                    # Add roles
+                    sql = "insert into roles (employee_number, role) values (%s, %s)"
+                    val = (employee_number, 'SUBMITTER')
+                    cursor.execute(sql, val)
+
+                    if approver:
+                        val = (employee_number, 'APPROVER')
+                        cursor.execute(sql, val)
+
+                    mysql.connection.commit()
+
+                    msg = 'You have successfully registered!'
+            elif request.method == 'POST':
+                # Form is empty... (no POST data)
+                msg = 'Please fill out the form!'
+            # Show registration form with message (if any)
+            return render_template('register.html', msg=msg)
         else:
-            # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO employees VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)', 
-                (employee_number, password, employee_name, email, bank_name, account_number, ifsc_code,))
-            mysql.connection.commit()
-            msg = 'You have successfully registered!'
-    elif request.method == 'POST':
-        # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
-    # Show registration form with message (if any)
-    return render_template('register.html', msg=msg)
+            return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
+
 
 @app.route('/expensecontrol/home')
 def home():
@@ -400,3 +418,49 @@ def delete_user(user_id):
             mysql.connection.commit()
         return redirect(url_for('list_users'))
     return redirect(url_for('login'))
+
+def add_user():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "employee_number", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+            'employee_number' in request.form and \
+            'password' in request.form and \
+            'email' in request.form and \
+            'employee_name' in request.form and \
+            'bank_name' in request.form and \
+            'account_number' in request.form and \
+            'ifsc_code' in request.form:
+        # Create variables for easy access
+        employee_number = request.form['employee_number']
+        password = request.form['password']
+        email = request.form['email']
+        employee_name = request.form['employee_name']
+        bank_name = request.form['bank_name']
+        account_number = request.form['account_number']
+        ifsc_code = request.form['ifsc_code']
+
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM employees WHERE employee_number = %s', (employee_number,))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', employee_name):
+            msg = 'Username must contain only characters and numbers!'
+        elif not employee_number or not employee_name or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            cursor.execute('INSERT INTO employees VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)', 
+                (employee_number, password, employee_name, email, bank_name, account_number, ifsc_code,))
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show registration form with message (if any)
+    return render_template('register.html', msg=msg)

@@ -75,15 +75,29 @@ val = ('1', 'ADMIN')
 cursor.execute(sql, val)
 val = ('1', 'APPROVER')
 cursor.execute(sql, val)
+val = ('1', 'SUBMITTER')
+cursor.execute(sql, val)
 
 sql = "insert into employees ( employee_number, \
         password, employee_name, employee_email, bank_name, account_number, ifsc_code) \
         values (%s, %s, %s, %s, %s, %s, %s)"
-val = ('2', '1234', 'Sudarshan Bhide', 'sudarshan.demo@gmail.com', 'Deutsche Bank', '12345678', 'DEUTINPBC')
+val = ('2', '1234', 'Jackie Sanders', 'jackie.sanders@gmail.com', 'Deutsche Bank', '12345678', 'DEUTINPBC')
 cursor.execute(sql, val)
 
 sql = "insert into roles (employee_number, role) values (%s, %s)"
 val = ('2', 'APPROVER')
+cursor.execute(sql, val)
+val = ('2', 'SUBMITTER')
+cursor.execute(sql, val)
+
+sql = "insert into employees ( employee_number, \
+        password, employee_name, employee_email, bank_name, account_number, ifsc_code) \
+        values (%s, %s, %s, %s, %s, %s, %s)"
+val = ('3', '1234', 'Ryan Woods', 'ryan.woods@gmail.com', 'Deutsche Bank', '12345678', 'DEUTINPBC')
+cursor.execute(sql, val)
+
+sql = "insert into roles (employee_number, role) values (%s, %s)"
+val = ('3', 'SUBMITTER')
 cursor.execute(sql, val)
 
 insert_types(cursor)
@@ -98,7 +112,7 @@ sql = "insert into expense_reports ( employee_number, \
 
 ts = time.time()
 timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-val = ('1', timestamp, timestamp, 'Customer event in Bangalore', 'CREATED')
+val = ('1', timestamp, timestamp, 'Travel to The Burrow', 'CREATED')
 cursor.execute(sql, val)
 report_id = cursor.lastrowid
 print(report_id)
@@ -108,39 +122,81 @@ sql = "insert into expenses (expense_report_id, type, create_ts, location, \
     currency, \
     purpose) values (%s, %s, %s, %s, %s, %s, %s)"
 
-val = (str(report_id), "Travel", timestamp, "Pune", "12000.50", "INR", "Flight ticket")
+val = (str(report_id), "Travel", timestamp, "London", "12000.50", "GBP", "Time travel to London")
 cursor.execute(sql, val)
+
+val = (str(report_id), "Travel", timestamp, "London", "23", "GBP", "Food on the way")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Books/Media", timestamp, "The Burrow", "12", "GBP", "Harry Potter books")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Travel", timestamp, "Malfoy Manor", "45", "GBP", "Manor sight-seeing")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Meals", timestamp, "Shell Cottage", "22", "GBP", "Dinner")
+cursor.execute(sql, val)
+
+sql = "insert into expense_reports ( employee_number, \
+        create_ts, \
+        last_update_ts, \
+        title, \
+        status) \
+        values (%s, %s, %s, %s, %s)"
+
+val = ('1', timestamp, timestamp, 'Travel to Hawkins, Indiana', 'CREATED')
+cursor.execute(sql, val)
+report_id = cursor.lastrowid
+print(report_id)
 
 sql = "insert into expenses (expense_report_id, type, create_ts, location, \
     amount, \
     currency, \
     purpose) values (%s, %s, %s, %s, %s, %s, %s)"
 
-val = (str(report_id), "Travel", timestamp, "Bangalore", "1010", "INR", "Taxi from Bangalore airport")
+val = (str(report_id), "Travel", timestamp, "Mumbai", "1200", "USD", "Flight ticket")
 cursor.execute(sql, val)
+
+val = (str(report_id), "Travel", timestamp, "Hawkins", "68", "USD", "Train to Hawkins")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Books/Media", timestamp, "Hawkins", "20", "USD", "Stranger Things media")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Software", timestamp, "Hawkins", "400", "USD", "Time travel software")
+cursor.execute(sql, val)
+
+
+sql = "insert into expense_reports ( employee_number, \
+        create_ts, \
+        last_update_ts, \
+        title, \
+        status) \
+        values (%s, %s, %s, %s, %s)"
+
+val = ('3', timestamp, timestamp, 'Sightseeing in Pune', 'CREATED')
+cursor.execute(sql, val)
+report_id = cursor.lastrowid
+print(report_id)
 
 sql = "insert into expenses (expense_report_id, type, create_ts, location, \
     amount, \
     currency, \
     purpose) values (%s, %s, %s, %s, %s, %s, %s)"
 
-val = (str(report_id), "Travel", timestamp, "Bangalore", "1200", "INR", "Taxi to Bangalore airport")
+val = (str(report_id), "Travel", timestamp, "Pune", "50", "INR", "Metro ticket")
 cursor.execute(sql, val)
 
-sql = "insert into expenses (expense_report_id, type, create_ts, location, \
-    amount, \
-    currency, \
-    purpose) values (%s, %s, %s, %s, %s, %s, %s)"
-
-val = (str(report_id), "Travel", timestamp, "Bangalore", "500", "INR", "Taxi to customer location")
+val = (str(report_id), "Meals", timestamp, "Pune", "250", "INR", "Breakfast at Vaishali")
 cursor.execute(sql, val)
 
-sql = "insert into expenses (expense_report_id, type, create_ts, location, \
-    amount, \
-    currency, \
-    purpose) values (%s, %s, %s, %s, %s, %s, %s)"
+val = (str(report_id), "Travel", timestamp, "Lonavala", "500", "INR", "Visit to Lonavala")
+cursor.execute(sql, val)
 
-val = (str(report_id), "Meals", timestamp, "Bangalore", "200", "INR", "Dinner")
+val = (str(report_id), "Travel", timestamp, "Pune", "400", "INR", "Visit to old town")
+cursor.execute(sql, val)
+
+val = (str(report_id), "Travel", timestamp, "Pune", "1200", "INR", "Train to Delhi")
 cursor.execute(sql, val)
 
 db.commit()
